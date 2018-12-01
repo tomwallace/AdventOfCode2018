@@ -4,7 +4,7 @@
     {
         public void Execute()
         {
-            System.Console.WriteLine("AdventOfCode2017 offers the following commands");
+            System.Console.WriteLine("AdventOfCode2018 offers the following commands");
             System.Console.WriteLine("");
 
             System.Console.WriteLine("/clear");

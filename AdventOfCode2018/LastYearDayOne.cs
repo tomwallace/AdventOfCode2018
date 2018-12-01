@@ -13,7 +13,7 @@ namespace AdventOfCode2018
 
         public int SortOrder()
         {
-            return 1;
+            return 99;
         }
 
         public string PartA()

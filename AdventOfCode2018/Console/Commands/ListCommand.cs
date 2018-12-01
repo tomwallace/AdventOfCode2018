@@ -17,7 +17,7 @@ namespace AdventOfCode2018.Console.Commands
                     return instance.SortOrder();
                 });
             
-            System.Console.WriteLine("AdventOfCode2017 has the following problem sets:");
+            System.Console.WriteLine("AdventOfCode2018 has the following problem sets:");
             System.Console.WriteLine("");
 
             System.Console.WriteLine("Class Name  -  Description");
