@@ -39,8 +39,6 @@ namespace AdventOfCode2018.Tests
             Assert.Equal("497", result);
         }
 
-        // Commented out as it takes about 30 sec to run
-        /*
         [Fact]
         public void PartB_Actual()
         {
@@ -49,6 +47,5 @@ namespace AdventOfCode2018.Tests
 
             Assert.Equal("558", result);
         }
-        */
     }
 }

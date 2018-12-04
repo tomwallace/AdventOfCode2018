@@ -37,7 +37,7 @@ namespace AdventOfCode2018.One
             List<int> alterations = ParseForSplitInts(filePath);
             int? duplicate = null;
 
-            List<int> accumulatedFrequencies = ProcessFrequencies(alterations, new List<int>() { startingFrequency }, startingFrequency, out duplicate);
+            HashSet<int> accumulatedFrequencies = ProcessFrequencies(alterations, new HashSet<int>(), startingFrequency, out duplicate);
 
             return accumulatedFrequencies.Last();
         }
@@ -45,7 +45,7 @@ namespace AdventOfCode2018.One
         public int FindFirstDuplicateFrequency(string filePath, int startingFrequency)
         {
             List<int> alterations = ParseForSplitInts(filePath);
-            List<int> accumulatedFrequencies = new List<int>() { startingFrequency };
+            HashSet<int> accumulatedFrequencies = new HashSet<int>() { startingFrequency };
             int currentFrquency = startingFrequency;
             int? duplicate = null;
             do
@@ -58,7 +58,7 @@ namespace AdventOfCode2018.One
         }
 
         // I am not fond of the out variable to detect the duplictes, but it is easier than parsing the accumulated frequencies for the first duplicate on every run
-        private List<int> ProcessFrequencies(List<int> alterations, List<int> accumulatedFrequencies, int startingFrequency, out int? duplicate)
+        private HashSet<int> ProcessFrequencies(List<int> alterations, HashSet<int> accumulatedFrequencies, int startingFrequency, out int? duplicate)
         {
             duplicate = null;
             int currentFrequency = startingFrequency;
