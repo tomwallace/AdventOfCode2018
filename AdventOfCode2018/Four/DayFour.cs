@@ -24,7 +24,6 @@ namespace AdventOfCode2018.Four
             return factor.ToString();
         }
 
-        // TODO: Need to finish Day 4
         public string PartB()
         {
             string filePath = @"Four\DayFourInput.txt";

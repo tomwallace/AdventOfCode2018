@@ -97,6 +97,12 @@
     <Content Include="One\DayOneTestInputG.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Three\DayThreeInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Three\DayThreeTestInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Two\DayTwoInput.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
