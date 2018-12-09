@@ -15,40 +15,32 @@ namespace AdventOfCode2018.Tests
             Assert.Equal(17, result);
         }
 
-        /*
         [Fact]
         public void GetIdOfUnoverlappingClaim()
         {
-            var filePath = @"Three\DayThreeTestInput.txt";
-            var sut = new DayThree();
-            var result = sut.GetIdOfUnoverlappingClaim(filePath);
+            var filePath = @"Six\DaySixTestInput.txt";
+            var sut = new DaySix();
+            var result = sut.FindSizeOfTargetArea(filePath, 32);
 
-            Assert.Equal(3, result);
+            Assert.Equal(16, result);
         }
-        */
 
-        // TODO: I don't think I am removing inputs that hit the edge properly, so I am not getting the correct answer.
         [Fact]
         public void PartA_Actual()
         {
             var sut = new DaySix();
             var result = sut.PartA();
 
-            // 4678 are too high
-            // 4136 is NOT correct
-            // 4092 is NOT correct
-            Assert.Equal("-1", result);
+            Assert.Equal("3969", result);
         }
 
-        /*
         [Fact]
         public void PartB_Actual()
         {
-            var sut = new DayThree();
+            var sut = new DaySix();
             var result = sut.PartB();
 
-            Assert.Equal("188", result);
+            Assert.Equal("42123", result);
         }
-        */
     }
 }

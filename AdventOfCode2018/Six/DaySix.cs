@@ -17,6 +17,7 @@ namespace AdventOfCode2018.Six
             return 6;
         }
 
+        // I struggled with PartA a great deal because I was not handling the locations that touched the outside of the grid properly.
         public string PartA()
         {
             string filePath = @"Six\DaySixInput.txt";
@@ -26,8 +27,9 @@ namespace AdventOfCode2018.Six
 
         public string PartB()
         {
-            //int bestSize = FindBestPolymerAfterRemovingAUnit(Input);
-            return "";
+            string filePath = @"Six\DaySixInput.txt";
+            int totalSize = FindSizeOfTargetArea(filePath, 10000);
+            return totalSize.ToString();
         }
 
         public int FindLargestArea(string fileName)
@@ -36,12 +38,8 @@ namespace AdventOfCode2018.Six
 
             int[,] grid = CreateGrid(coords);
 
-            List<int> idsNearEdge =
-                coords.Where(
-                    c =>
-                        c.Value.X < 2 || c.Value.Y < 2 || c.Value.X > (grid.GetUpperBound(0) - 2) ||
-                        c.Value.Y > (grid.GetUpperBound(1) - 2)).Select(c => c.Key).ToList();
-            
+            List<int> idsNearEdge = new List<int>();
+
             // Fill the grid
             for (int x = 0; x < grid.GetLength(0); x++)
             {
@@ -66,6 +64,10 @@ namespace AdventOfCode2018.Six
                         }
                     }
 
+                    if (x <= 0 || y <= 0 || x >= grid.GetUpperBound(0) || y >= grid.GetUpperBound(1))
+                    {
+                        idsNearEdge.Add(closestId);
+                    }
                     grid[x, y] = overlap ? -1 : closestId;
                 }
             }
@@ -83,13 +85,44 @@ namespace AdventOfCode2018.Six
                 }
             }
 
-            foreach (int edgeId in idsNearEdge)
+            foreach (int edgeId in idsNearEdge.Distinct())
             {
                 countedValues[edgeId] = -1;
             }
 
             var sorted = countedValues.OrderByDescending(x => x).ToList();
             return sorted.FirstOrDefault();
+        }
+
+        public int FindSizeOfTargetArea(string fileName, int totalDistanceMin)
+        {
+            Dictionary<int, Coordinate> coords = GetCoords(fileName);
+
+            int[,] grid = CreateGrid(coords);
+
+            int locationsMeetingRequirements = 0;
+
+            List<int> idsNearEdge = new List<int>();
+
+            // Fill the grid
+            for (int x = 0; x < grid.GetLength(0); x++)
+            {
+                for (int y = 0; y < grid.GetLength(1); y++)
+                {
+                    int totalDistance = 0;
+
+                    foreach (var coord in coords)
+                    {
+                        int distance = GetManhattanDistance(x, coord.Value.X, y, coord.Value.Y);
+                        totalDistance += distance;
+                    }
+
+                    if (totalDistance < totalDistanceMin)
+                        locationsMeetingRequirements++;
+                }
+            }
+
+            return locationsMeetingRequirements;
         }
 
         private int[,] CreateGrid(Dictionary<int, Coordinate> coords)
@@ -141,7 +174,5 @@ namespace AdventOfCode2018.Six
         public int Y { get; set; }
 
         public int IdOfClosest { get; set; }
-
-        public bool NearEdge { get; set; }
     }
 }
