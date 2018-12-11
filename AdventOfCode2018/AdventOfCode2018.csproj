@@ -65,6 +65,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Seven\DaySeven.cs" />
     <Compile Include="Six\DaySix.cs" />
+    <Compile Include="Ten\DayTen.cs" />
     <Compile Include="Three\DayThree.cs" />
     <Compile Include="Two\DayTwo.cs" />
   </ItemGroup>
@@ -112,6 +113,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Six\DaySixTestInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Ten\DayTenInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Ten\DayTenTestInput.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Three\DayThreeInput.txt">
