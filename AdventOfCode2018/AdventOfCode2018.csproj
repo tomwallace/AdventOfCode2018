@@ -55,6 +55,7 @@
     <Compile Include="Console\Commands\VersionCommand.cs" />
     <Compile Include="Console\ICommand.cs" />
     <Compile Include="Eight\DayEight.cs" />
+    <Compile Include="Eleven\DayEleven.cs" />
     <Compile Include="Five\DayFive.cs" />
     <Compile Include="Four\DayFour.cs" />
     <Compile Include="IAdventProblemSet.cs" />
