@@ -34,7 +34,7 @@ namespace AdventOfCode2018.Tests
             Assert.Equal("143,43", result);
         }
 
-        // TODO: Figure out why not working
+        // TODO: Figure out why not working - we have changed a lot
         [Fact]
         public void PartB_Actual()
         {
@@ -43,6 +43,7 @@ namespace AdventOfCode2018.Tests
             // Not 140,52
             // Not 83,100
             // Not 82,100
+            // Not 56,51
             Assert.Equal("", result);
         }
     }

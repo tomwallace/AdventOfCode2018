@@ -69,24 +69,37 @@ namespace AdventOfCode2018.Thirteen
             {
                 for (int i = 0; i < carts.Count; i++)
                 {
-                    carts[i].Move(_tracks);
+                    if (!carts[i].Destroyed)
+                        carts[i].Move(_tracks);
+
+                    var grouped = carts.Where(c => c.Destroyed == false).GroupBy(c => c.Position).Where(g => g.Count() == 2);
+                    foreach (var coord in grouped)
+                    {
+                        foreach (var mineCart in carts.Where(c => c.Position.ToString() == coord.Key.ToString()))
+                        {
+                            mineCart.Destroyed = true;
+                        }
+                    }
+
                     
                 }
 
+                /*
                 var grouped = carts.GroupBy(c => c.Position).Where(g => g.Count() == 2);
                 foreach (var coord in grouped)
                 {
                     carts.RemoveAll(c => c.Position.ToString() == coord.Key.ToString());
                 }
-
-                if (carts.Count == 1)
+                */
+                if (carts.Count(c => c.Destroyed == false) == 1)
                 {
                     solo = true;
                     soloLocation = carts[0].Position.ToString();
                     //break;
                 }
 
-                carts = carts.OrderBy(c => c.Position.Y).ThenBy(c => c.Position.X).ToList();
+
+                carts = carts.OrderBy(c => c.Destroyed).ThenBy(c => c.Position.Y).ThenBy(c => c.Position.X).ToList();
             } while (!solo);
 
             return soloLocation;
@@ -145,6 +158,7 @@ namespace AdventOfCode2018.Thirteen
                 Direction = 4;
 
             CrossingDecision = 0;
+            Destroyed = false;
         }
 
         public Coordinate Position { get; set; }
@@ -153,6 +167,8 @@ namespace AdventOfCode2018.Thirteen
         public int Direction { get; set; }
 
         public int CrossingDecision { get; set; }
+
+        public bool Destroyed { get; set; }
 
         public void Move(List<char[]> grid)
         {

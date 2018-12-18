@@ -54,8 +54,10 @@
     <Compile Include="Console\Commands\RunCommand.cs" />
     <Compile Include="Console\Commands\VersionCommand.cs" />
     <Compile Include="Console\ICommand.cs" />
+    <Compile Include="Eighteen\DayEighteen.cs" />
     <Compile Include="Eight\DayEight.cs" />
     <Compile Include="Eleven\DayEleven.cs" />
+    <Compile Include="Fifteen\DayFifteen.cs" />
     <Compile Include="Five\DayFive.cs" />
     <Compile Include="Fourteen\DayFourteen.cs" />
     <Compile Include="Four\DayFour.cs" />
@@ -78,6 +80,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Eighteen\DayEighteenInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Eighteen\DayEighteenTestInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Four\DayFourInput.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
