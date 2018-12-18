@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -34,8 +35,11 @@ namespace AdventOfCode2018.Twelve
         public string PartB()
         {
             string filePath = @"Twelve\DayTwelveInput.txt";
-            long sum = FindPlantSum(filePath, 50000000000);
-            return sum.ToString();
+            // In looking at the output, every entry after 100 adds 91 (50 billion is too much to add)
+            // So get the sum after 100 and then do the math
+            long sum = FindPlantSum(filePath, 100);
+            long remainder = (50000000000 - 100) * 91;
+            return (sum + remainder).ToString();
         }
 
         public long FindPlantSum(string filePath, long generations)
@@ -49,11 +53,10 @@ namespace AdventOfCode2018.Twelve
             {
                 if (knownStates.ContainsKey(plantState))
                     plantState = knownStates[plantState];
-
                 else
                 {
                     string initialState = plantState;
-                    
+
                     // Add buffers
                     if (plantState[0] == '#')
                     {
@@ -77,7 +80,7 @@ namespace AdventOfCode2018.Twelve
                         plantState = plantState + "..";
                     else if (plantState[plantState.Length - 3] == '#')
                         plantState = plantState + ".";
-                        
+
                     //string initialState = "..." + plantState + "...";
                     //currentLeftIndex -= 3;
                     StringBuilder builder = new StringBuilder();
@@ -100,7 +103,19 @@ namespace AdventOfCode2018.Twelve
 
                     knownStates.Add(initialState, plantState);
                 }
-                
+
+                // print values
+                long counter = 0;
+                long leftInd = currentLeftIndex;
+                foreach (char c in plantState)
+                {
+                    if (c == '#')
+                        counter += leftInd;
+
+                    leftInd++;
+                }
+
+                Debug.WriteLine($"{counter}");
             }
 
             // Sum values
@@ -128,10 +143,10 @@ namespace AdventOfCode2018.Twelve
             {
                 if (line.Contains("initial state"))
                 {
-                    string[] split = line.Split(new string[] {"initial state: "}, StringSplitOptions.None);
+                    string[] split = line.Split(new string[] { "initial state: " }, StringSplitOptions.None);
                     plantState = split[1].Trim();
                 }
-                else if(line.Contains("=>"))
+                else if (line.Contains("=>"))
                 {
                     string[] split = line.Split(new string[] { " => " }, StringSplitOptions.None);
                     char convertTo = split[1].Trim()[0];

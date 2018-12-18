@@ -24,16 +24,12 @@ namespace AdventOfCode2018.Tests
             Assert.Equal("4217", result);
         }
 
-        // TODO: Figure out how to handle - as getting out of memory exception with the dictionary approach
-        // TODO: Try running overnight without dictionary
-        /*
         [Fact]
         public void PartB_Actual()
         {
             var sut = new DayTwelve();
             var result = sut.PartB();
-            Assert.Equal("", result);
+            Assert.Equal("4550000002111", result);
         }
-        */
     }
 }
