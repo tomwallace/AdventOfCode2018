@@ -60,17 +60,6 @@
                             totalLoop += grid[xLoop, yLoop];
                         }
                     }
-                    //// NW
-                    //int nw = grid[x - 1, y + 1];
-                    //int n = grid[x, y + 1];
-                    //int ne = grid[x + 1, y + 1];
-                    //int e = grid[x + 1, y];
-                    //int se = grid[x + 1, y - 1];
-                    //int s = grid[x, y - 1];
-                    //int sw = grid[x - 1, y - 1];
-                    //int c = grid[x, y];
-
-                    //int total = nw + n + ne + e + se + s + sw + c;
 
                     if (totalLoop > highestTotal)
                     {

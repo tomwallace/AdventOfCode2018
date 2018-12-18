@@ -1,0 +1,146 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+
+namespace AdventOfCode2018.Twelve
+{
+    public class DayTwelve : IAdventProblemSet
+    {
+        private Dictionary<string, char> _patterns;
+
+        public DayTwelve()
+        {
+            _patterns = new Dictionary<string, char>();
+        }
+
+        public string Description()
+        {
+            return "Subterranean Sustainability";
+        }
+
+        public int SortOrder()
+        {
+            return 12;
+        }
+
+        public string PartA()
+        {
+            string filePath = @"Twelve\DayTwelveInput.txt";
+            long sum = FindPlantSum(filePath, 20);
+            return sum.ToString();
+        }
+
+        public string PartB()
+        {
+            string filePath = @"Twelve\DayTwelveInput.txt";
+            long sum = FindPlantSum(filePath, 50000000000);
+            return sum.ToString();
+        }
+
+        public long FindPlantSum(string filePath, long generations)
+        {
+            string plantState = ParsePatterns(filePath);
+            int currentLeftIndex = 0;
+
+            Dictionary<string, string> knownStates = new Dictionary<string, string>();
+
+            for (int i = 0; i < generations; i++)
+            {
+                if (knownStates.ContainsKey(plantState))
+                    plantState = knownStates[plantState];
+
+                else
+                {
+                    string initialState = plantState;
+                    
+                    // Add buffers
+                    if (plantState[0] == '#')
+                    {
+                        plantState = "..." + plantState;
+                        currentLeftIndex -= 3;
+                    }
+                    else if (plantState[1] == '#')
+                    {
+                        plantState = ".." + plantState;
+                        currentLeftIndex -= 2;
+                    }
+                    else if (plantState[2] == '#')
+                    {
+                        plantState = "." + plantState;
+                        currentLeftIndex -= 1;
+                    }
+
+                    if (plantState[plantState.Length - 1] == '#')
+                        plantState = plantState + "...";
+                    else if (plantState[plantState.Length - 2] == '#')
+                        plantState = plantState + "..";
+                    else if (plantState[plantState.Length - 3] == '#')
+                        plantState = plantState + ".";
+                        
+                    //string initialState = "..." + plantState + "...";
+                    //currentLeftIndex -= 3;
+                    StringBuilder builder = new StringBuilder();
+                    for (int c = 0; c < plantState.Length; c++)
+                    {
+                        if (c < 2 || c >= plantState.Length - 2)
+                            builder.Append(plantState[c]);
+                        else
+                        {
+                            // See if any matches and substitute
+                            string subSection = plantState.Substring(c - 2, 5);
+                            if (_patterns.ContainsKey(subSection))
+                                builder.Append(_patterns[subSection]);
+                            else
+                                builder.Append(".");
+                        }
+                    }
+
+                    plantState = builder.ToString();
+
+                    knownStates.Add(initialState, plantState);
+                }
+                
+            }
+
+            // Sum values
+            long sumPlantIndexes = 0;
+            foreach (char c in plantState)
+            {
+                if (c == '#')
+                    sumPlantIndexes += currentLeftIndex;
+
+                currentLeftIndex++;
+            }
+
+            return sumPlantIndexes;
+        }
+
+        private string ParsePatterns(string filePath)
+        {
+            string plantState = "";
+            string line;
+            StreamReader file = new StreamReader(filePath);
+            int y = 0;
+
+            // Iterate over each line in the input
+            while ((line = file.ReadLine()) != null)
+            {
+                if (line.Contains("initial state"))
+                {
+                    string[] split = line.Split(new string[] {"initial state: "}, StringSplitOptions.None);
+                    plantState = split[1].Trim();
+                }
+                else if(line.Contains("=>"))
+                {
+                    string[] split = line.Split(new string[] { " => " }, StringSplitOptions.None);
+                    char convertTo = split[1].Trim()[0];
+                    _patterns.Add(split[0], convertTo);
+                }
+            }
+            file.Close();
+
+            return plantState;
+        }
+    }
+}

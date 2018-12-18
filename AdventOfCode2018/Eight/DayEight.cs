@@ -10,7 +10,7 @@ namespace AdventOfCode2018.Eight
 
         public string Description()
         {
-            return "Memory Maneuver";
+            return "Memory Maneuver (HARD)";
         }
 
         public int SortOrder()
