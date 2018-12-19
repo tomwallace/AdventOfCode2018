@@ -9,7 +9,7 @@ namespace AdventOfCode2018.Sixteen
     {
         public string Description()
         {
-            return "Chronal Classification";
+            return "Chronal Classification (HARD)";
         }
 
         public int SortOrder()
