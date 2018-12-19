@@ -80,24 +80,13 @@ namespace AdventOfCode2018.Thirteen
                             mineCart.Destroyed = true;
                         }
                     }
-
-                    
                 }
 
-                /*
-                var grouped = carts.GroupBy(c => c.Position).Where(g => g.Count() == 2);
-                foreach (var coord in grouped)
-                {
-                    carts.RemoveAll(c => c.Position.ToString() == coord.Key.ToString());
-                }
-                */
                 if (carts.Count(c => c.Destroyed == false) == 1)
                 {
                     solo = true;
-                    soloLocation = carts[0].Position.ToString();
-                    //break;
+                    soloLocation = carts.First(c => c.Destroyed == false).Position.ToString();
                 }
-
 
                 carts = carts.OrderBy(c => c.Destroyed).ThenBy(c => c.Position.Y).ThenBy(c => c.Position.X).ToList();
             } while (!solo);
@@ -174,7 +163,7 @@ namespace AdventOfCode2018.Thirteen
         {
             Position = NewPosition();
 
-            // Adjusst facing
+            // Adjust facing
             char reading = grid[Position.Y][Position.X];
             if (reading == '/')
             {

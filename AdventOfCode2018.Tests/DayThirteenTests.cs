@@ -34,17 +34,12 @@ namespace AdventOfCode2018.Tests
             Assert.Equal("143,43", result);
         }
 
-        // TODO: Figure out why not working - we have changed a lot
         [Fact]
         public void PartB_Actual()
         {
             var sut = new DayThirteen();
             var result = sut.PartB();
-            // Not 140,52
-            // Not 83,100
-            // Not 82,100
-            // Not 56,51
-            Assert.Equal("", result);
+            Assert.Equal("116,125", result);
         }
     }
 }
