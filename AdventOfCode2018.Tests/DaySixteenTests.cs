@@ -1,5 +1,4 @@
 ﻿using AdventOfCode2018.Sixteen;
-using AdventOfCode2018.Thirteen;
 using Xunit;
 
 namespace AdventOfCode2018.Tests
@@ -15,17 +14,7 @@ namespace AdventOfCode2018.Tests
 
             Assert.Equal(1, result);
         }
-        /*
-        [Fact]
-        public void FindLocationOfLastCart()
-        {
-            var filePath = @"Thirteen\DayThirteenTestInputB.txt";
-            var sut = new DayThirteen();
-            var result = sut.FindLocationOfLastCart(filePath);
 
-            Assert.Equal("6,4", result);
-        }
-        */
         [Fact]
         public void PartA_Actual()
         {
@@ -40,7 +29,7 @@ namespace AdventOfCode2018.Tests
         {
             var sut = new DaySixteen();
             var result = sut.PartB();
-            Assert.Equal("", result);
+            Assert.Equal("540", result);
         }
     }
 }

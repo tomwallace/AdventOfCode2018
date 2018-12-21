@@ -32,7 +32,6 @@ namespace AdventOfCode2018.Sixteen
             return result.ToString();
         }
 
-        // TODO: Figure out how to reduce code duplication
         public int HowManySamplesBehaveLikeAtLeastThreeOpcodes(string filePath)
         {
             Dictionary<string, List<int>> opCodes = new Dictionary<string, List<int>>();
@@ -75,27 +74,25 @@ namespace AdventOfCode2018.Sixteen
 
         public int SolveSampleForRegisterOne(string filePath, string filePathTestProgram)
         {
-            Dictionary<string, List<int>> opCodes = new Dictionary<string, List<int>>();
-            opCodes.Add("addr", new List<int>());
-            opCodes.Add("addi", new List<int>());
-            opCodes.Add("mulr", new List<int>());
-            opCodes.Add("muli", new List<int>());
-            opCodes.Add("banr", new List<int>());
-            opCodes.Add("bani", new List<int>());
-            opCodes.Add("borr", new List<int>());
-            opCodes.Add("bori", new List<int>());
-            opCodes.Add("setr", new List<int>());
-            opCodes.Add("seti", new List<int>());
-            opCodes.Add("gtir", new List<int>());
-            opCodes.Add("gtri", new List<int>());
-            opCodes.Add("gtrr", new List<int>());
-            opCodes.Add("eqir", new List<int>());
-            opCodes.Add("eqri", new List<int>());
-            opCodes.Add("eqrr", new List<int>());
+            Dictionary<string, HashSet<int>> opCodes = new Dictionary<string, HashSet<int>>();
+            opCodes.Add("addr", new HashSet<int>());
+            opCodes.Add("addi", new HashSet<int>());
+            opCodes.Add("mulr", new HashSet<int>());
+            opCodes.Add("muli", new HashSet<int>());
+            opCodes.Add("banr", new HashSet<int>());
+            opCodes.Add("bani", new HashSet<int>());
+            opCodes.Add("borr", new HashSet<int>());
+            opCodes.Add("bori", new HashSet<int>());
+            opCodes.Add("setr", new HashSet<int>());
+            opCodes.Add("seti", new HashSet<int>());
+            opCodes.Add("gtir", new HashSet<int>());
+            opCodes.Add("gtri", new HashSet<int>());
+            opCodes.Add("gtrr", new HashSet<int>());
+            opCodes.Add("eqir", new HashSet<int>());
+            opCodes.Add("eqri", new HashSet<int>());
+            opCodes.Add("eqrr", new HashSet<int>());
 
             List<Instruction> instructions = GetInstructions(filePath);
-
-            int numberAtLeastThree = 0;
 
             foreach (var instruction in instructions)
             {
@@ -110,57 +107,27 @@ namespace AdventOfCode2018.Sixteen
             // Create reference
             string[] opCodeMatches = new string[16];
 
-            for (int i = 1; i <= 16; i++)
+            // Find the matching opCode by looking for the instruction that only matched one set
+            do
             {
-                int highestCount = 0;
-                string highestName = "";
-
-                foreach (var opCode in opCodes)
+                for (int i = 0; i < 16; i++)
                 {
-                    int count = opCode.Value.Where(c => c == i).Count();
-                    if (count >= highestCount && !opCodeMatches.Contains(opCode.Key))
+                    int matches = opCodes.Count(c => c.Value.Contains(i));
+                    if (matches == 1)
                     {
-                        highestCount = count;
-                        highestName = opCode.Key;
+                        var match = opCodes.First(c => c.Value.Contains(i));
+                        opCodeMatches[i] = match.Key;
+                        opCodes.Remove(match.Key);
+                        break;
                     }
                 }
+            } while (opCodes.Count > 0);
 
-                opCodeMatches[i - 1] = highestName;
-            }
-            
-            // I tried to do this in code, but it did not work out, so I am using the above information and doing it by hand
-            // NOT: borr, bori, eqrr
-            // borr, eqrr, bori
-            // bori, borr, eqrr
-            // bori, eqrr, borr
-            // eqrr, borr, bori
-            // eqrr, bori, borr
-            string[] manualMatches = new[]
-            {
-                "gtri",
-                "setr",
-                "gtrr",
-                "addr",
-                "mulr",
-                "banr",
-                "muli",
-                "gtir",
-                "bori",   // **
-                "addi",
-                "eqir",
-                "eqri",
-                "eqrr",   // **
-                "bani",
-                "seti",
-                "borr"   // **
-            };
-
-            // TODO: The current state does not work, so my matching answers must not be working
             // Starting state
-            int[] registers = new[] {0, 0, 0, 0};
+            int[] registers = new[] { 0, 0, 0, 0 };
             foreach (var operations in GetTestProgram(filePathTestProgram))
             {
-                string opCodeName = manualMatches[operations[0]];
+                string opCodeName = opCodeMatches[operations[0]];
                 registers = UseOpCode(opCodeName, registers, operations);
             }
 
@@ -232,94 +199,10 @@ namespace AdventOfCode2018.Sixteen
 
         private int ProcessOpCode(string name, int[] startState, int[] operations, int[] endState)
         {
-            switch (name)
-            {
-                case "addr":
-                    startState[operations[3]] = startState[operations[1]] + startState[operations[2]];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "addi":
-                    startState[operations[3]] = startState[operations[1]] + operations[2];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "mulr":
-                    startState[operations[3]] = startState[operations[1]] * startState[operations[2]];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "muli":
-                    startState[operations[3]] = startState[operations[1]] * operations[2];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "banr":
-                    startState[operations[3]] = startState[operations[1]] & startState[operations[2]];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "bani":
-                    startState[operations[3]] = startState[operations[1]] & operations[2];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "borr":
-                    startState[operations[3]] = startState[operations[1]] | startState[operations[2]];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "bori":
-                    startState[operations[3]] = startState[operations[1]] | operations[2];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "setr":
-                    startState[operations[3]] = startState[operations[1]];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "seti":
-                    startState[operations[3]] = operations[1];
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "gtir":
-                    startState[operations[3]] = operations[1] > startState[operations[2]] ? 1 : 0;
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "gtri":
-                    startState[operations[3]] = startState[operations[1]] > operations[2] ? 1 : 0;
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "gtrr":
-                    startState[operations[3]] = startState[operations[1]] > startState[operations[2]] ? 1 : 0;
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "eqir":
-                    startState[operations[3]] = operations[1] == startState[operations[2]] ? 1 : 0;
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "eqri":
-                    startState[operations[3]] = startState[operations[1]] == operations[2] ? 1 : 0;
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                case "eqrr":
-                    startState[operations[3]] = startState[operations[1]] == startState[operations[2]] ? 1 : 0;
-                    return startState.SequenceEqual(endState) ? operations[0] : -1;
-                    break;
-
-                default:
-                    throw new ArgumentException("Trying to access opcode that does not exist");
-            }
+            var updatedState = UseOpCode(name, startState, operations);
+            return updatedState.SequenceEqual(endState) ? operations[0] : -1;
         }
 
-        // TODO: Figure out how to combine for code duplication reduction
         private int[] UseOpCode(string name, int[] startState, int[] operations)
         {
             switch (name)
