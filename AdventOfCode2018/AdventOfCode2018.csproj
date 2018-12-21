@@ -63,6 +63,7 @@
     <Compile Include="Four\DayFour.cs" />
     <Compile Include="IAdventProblemSet.cs" />
     <Compile Include="LastYearDayOne.cs" />
+    <Compile Include="Nineteen\DayNineteen.cs" />
     <Compile Include="Nine\DayNine.cs" />
     <Compile Include="One\DayOne.cs" />
     <Compile Include="Program.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Thirteen\DayThirteen.cs" />
     <Compile Include="Three\DayThree.cs" />
     <Compile Include="Twelve\DayTwelve.cs" />
+    <Compile Include="Twenty\DayTwenty.cs" />
     <Compile Include="Two\DayTwo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -96,6 +98,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Four\DayFourTestInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nineteen\DayNineteenInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nineteen\DayNineteenTestInput.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="One\DayOneInput.txt">

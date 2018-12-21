@@ -20,152 +20,72 @@ namespace AdventOfCode2018.Eight
 
         public string PartA()
         {
-            int totalMetadata = SumMetadata(ProblemInput);
-            return totalMetadata.ToString();
+            Node root = ProcessAndDetermineRoot(ProblemInput);
+            return root.Sum().ToString();
         }
 
         public string PartB()
         {
-            int totalChildWorth = SumChildWorth(ProblemInput);
-            return totalChildWorth.ToString();
+            Node root = ProcessAndDetermineRoot(ProblemInput);
+            return root.Value().ToString();
         }
 
-        public int SumMetadata(string input)
+        public Node ReadNode(List<int> numbers, ref int i)
         {
-            int[] inputArray = input.Split(' ').Select(x => int.Parse(x)).ToArray();
-            int runningTotalMetaData = 0;
-
-            Stack<Node> nodes = new Stack<Node>();
-            Node firstNode = new Node()
+            Node node = new Node();
+            int children = numbers[i++];
+            int metadata = numbers[i++];
+            for (int j = 0; j < children; j++)
             {
-                NumberOfChildren = inputArray[0],
-                OriginalNumberOfChildren = inputArray[0],
-                NumberOfMetadata = inputArray[1],
-                ChildValues = new List<int>()
-            };
-            nodes.Push(firstNode);
+                node.Nodes.Add(ReadNode(numbers, ref i));
+            }
 
-            int currentIndex = 2;
-            do
+            for (int j = 0; j < metadata; j++)
             {
-                Node currentNode = nodes.Pop();
+                node.Metadata.Add(numbers[i++]);
+            }
 
-                // If no children, we can collect the metadata
-                if (currentNode.NumberOfChildren == 0)
-                {
-                    for (int i = 0; i < currentNode.NumberOfMetadata; i++)
-                    {
-                        runningTotalMetaData += inputArray[currentIndex];
-                        currentIndex++;
-                    }
-                }
-                else
-                {
-                    // Otherwise, decrease children by one and create a new child node
-                    currentNode.NumberOfChildren--;
-                    nodes.Push(currentNode);
-
-                    Node childNode = new Node()
-                    {
-                        NumberOfChildren = inputArray[currentIndex],
-                        OriginalNumberOfChildren = inputArray[currentIndex],
-                        NumberOfMetadata = inputArray[currentIndex + 1],
-                        ChildValues = new List<int>()
-                    };
-                    nodes.Push(childNode);
-
-                    currentIndex += 2;
-                }
-            } while (nodes.Count > 0);
-
-            return runningTotalMetaData;
+            return node;
         }
 
-        public int SumChildWorth(string input)
+        public Node ProcessAndDetermineRoot(string input)
         {
-            int[] inputArray = input.Split(' ').Select(x => int.Parse(x)).ToArray();
+            List<int> inputList = input.Split(' ').Select(x => int.Parse(x)).ToList();
 
-            int trunkNodeChildValueSum = 0;
+            int i = 0;
+            Node root = ReadNode(inputList, ref i);
 
-            Stack<Node> nodes = new Stack<Node>();
-            Node firstNode = new Node()
-            {
-                NumberOfChildren = inputArray[0],
-                OriginalNumberOfChildren = inputArray[0],
-                NumberOfMetadata = inputArray[1],
-                ChildValues = new List<int>()
-            };
-            nodes.Push(firstNode);
-
-            int currentIndex = 2;
-            do
-            {
-                Node currentNode = nodes.Pop();
-
-                // If no children, we can collect the metadata
-                if (currentNode.NumberOfChildren == 0)
-                {
-                    int childValue = 0;
-
-                    for (int i = 0; i < currentNode.NumberOfMetadata; i++)
-                    {
-                        if (currentNode.OriginalNumberOfChildren > 0)
-                        {
-                            childValue += (currentNode.ChildValues.Count > inputArray[currentIndex]
-                                ? currentNode.ChildValues[inputArray[currentIndex] - 1]
-                                : 0);
-                            currentIndex++;
-                        }
-                        else
-                        {
-                            childValue += inputArray[currentIndex];
-                            currentIndex++;
-                        }
-                    }
-
-                    // If no children on the trunk node, then sum and break out
-                    if (nodes.Count == 0)
-                    {
-                        trunkNodeChildValueSum = childValue;
-                        break;
-                    }
-
-                    // Otherwise Adjust parent
-                    Node parentNode = nodes.Pop();
-                    parentNode.ChildValues.Add(childValue);
-                    nodes.Push(parentNode);
-                }
-                else
-                {
-                    // Otherwise, decrease children by one and create a new child node
-                    currentNode.NumberOfChildren--;
-                    nodes.Push(currentNode);
-
-                    Node childNode = new Node()
-                    {
-                        NumberOfChildren = inputArray[currentIndex],
-                        OriginalNumberOfChildren = inputArray[currentIndex],
-                        NumberOfMetadata = inputArray[currentIndex + 1],
-                        ChildValues = new List<int>()
-                    };
-                    nodes.Push(childNode);
-
-                    currentIndex += 2;
-                }
-            } while (nodes.Count > 0);
-
-            return trunkNodeChildValueSum;
+            return root;
         }
     }
 
     public class Node
     {
-        public int NumberOfChildren { get; set; }
+        public List<int> Metadata { get; set; } = new List<int>();
+        public List<Node> Nodes { get; set; } = new List<Node>();
 
-        public int OriginalNumberOfChildren { get; set; }
+        public int Sum()
+        {
+            return Metadata.Sum() + Nodes.Sum(x => x.Sum());
+        }
 
-        public int NumberOfMetadata { get; set; }
+        public int Value()
+        {
+            if (!Nodes.Any())
+            {
+                return Metadata.Sum();
+            }
 
-        public List<int> ChildValues { get; set; }
+            var value = 0;
+            foreach (var m in Metadata)
+            {
+                if (m <= Nodes.Count)
+                {
+                    value += Nodes[m - 1].Value();
+                }
+            }
+
+            return value;
+        }
     }
 }
