@@ -10,7 +10,7 @@ namespace AdventOfCode2018.Tests
         {
             var filePath = @"Nineteen\DayNineteenTestInput.txt";
             var sut = new DayNineteen();
-            var result = sut.FindValueInRegisterZero(filePath, 0, 0);
+            var result = sut.FindValueInRegisterZero(filePath, 0);
 
             Assert.Equal(6, result);
         }
@@ -24,17 +24,12 @@ namespace AdventOfCode2018.Tests
             Assert.Equal("1120", result);
         }
 
-
-        // TODO: We need to optimize - there must be a repeat in there
-        // I ran overnight and did not get a solution
-        /*
         [Fact]
         public void PartB_Actual()
         {
             var sut = new DayNineteen();
             var result = sut.PartB();
-            Assert.Equal("-1", result);
+            Assert.Equal("12768192", result);
         }
-        */
     }
 }

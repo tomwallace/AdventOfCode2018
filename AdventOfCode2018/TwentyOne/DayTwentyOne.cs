@@ -1,37 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace AdventOfCode2018.Nineteen
+namespace AdventOfCode2018.TwentyOne
 {
-    public class DayNineteen : IAdventProblemSet
+    public class DayTwentyOne : IAdventProblemSet
     {
         public string Description()
         {
-            return "Go With The Flow";
+            return "Chronal Conversion";
         }
 
         public int SortOrder()
         {
-            return 19;
+            return 21;
         }
 
         public string PartA()
         {
-            string filePath = @"Nineteen\DayNineteenInput.txt";
-            int value = FindValueInRegisterZero(filePath, 5);
+            string filePath = @"TwentyOne\DayTwentyOneInput.txt";
+            int value = FindValueOfRegisterTwo(filePath, 5);
             return value.ToString();
         }
 
         public string PartB()
         {
-            string filePath = @"Nineteen\DayNineteenInput.txt";
-            int value = FindValueInRegisterZeroExtended(filePath, 5);
+            string filePath = @"TwentyOne\DayTwentyOneInput.txt";
+            int value = FindMaxValueOfRegisterTwo(filePath, 5);
             return value.ToString();
         }
 
-        public int FindValueInRegisterZero(string filePath, int pointerIndex)
+        // I had to read some of the comments on the Reddit thread for this day just to figure out what the problem was asking.
+        // Then in reviewing the input, you can see the only line that involves Register Zero at all is line 28.  So, for Part One
+        // the best you can do is the value of the register that instruction writes to when our pointer reads 28.
+        public int FindValueOfRegisterTwo(string filePath, int pointerIndex)
         {
             int[] startState = new[] { 0, 0, 0, 0, 0, 0 };
             int pointerValue = -1;
@@ -44,6 +48,9 @@ namespace AdventOfCode2018.Nineteen
                 Instruction instruction = instructions[i];
                 UseOpCode(instruction.OpCode, startState, instruction.Operations);
 
+                if (startState[pointerIndex] == 28)
+                    return startState[2];
+
                 pointerValue = startState[pointerIndex];
 
                 i = pointerValue;
@@ -52,59 +59,46 @@ namespace AdventOfCode2018.Nineteen
             return startState[0];
         }
 
-        //I really struggled with this part of the program.  I looked on Reddit and found the following.  I was able
-        // to go through my input and eventually map it out.  Much harder than it should have been, but I
-        // eventually solved it.:
-
-        //R1 = 1
-        //do
-        //{
-        //if R3 * R1 == R5 {
-        //R0 += R3
-        //R2 = 1
-        //}
-        //else
-        //{
-        //R2 = 0
-        //}
-        //R1 += 1
-        //} while (R1 <= R5)
-
-        public int FindValueInRegisterZeroExtended(string filePath, int pointerIndex)
+        public int FindMaxValueOfRegisterTwo(string filePath, int pointerIndex)
         {
-            int[] startState = new[] { 1, 0, 0, 0, 0, 0 };
+            int[] startState = new[] { 0, 0, 0, 0, 0, 0 };
             int pointerValue = -1;
             List<Instruction> instructions = GetInstructions(filePath);
 
+            HashSet<int> seen = new HashSet<int>();
+            bool firstTimeThrough = true;
+            int lastAdded = 0;
+
             for (int i = 0; i < instructions.Count; i++)
             {
-                if (i == 2 && startState[2] != 0)
-                {
-                    if (startState[3] % startState[2] == 0)
-                    {
-                        startState[0] += startState[2];
-                    }
-                    startState[4] = 0;
-                    startState[1] = startState[3];
-
-                    startState[pointerIndex] = 11;
-
-                    pointerValue = startState[pointerIndex];
-
-                    i = pointerValue;
-                    continue;
-                }
                 startState[pointerIndex] = pointerValue + 1;
 
                 Instruction instruction = instructions[i];
                 UseOpCode(instruction.OpCode, startState, instruction.Operations);
+
+                if (startState[pointerIndex] == 28)
+                {
+                    if (seen.Contains(startState[2]))
+                    {
+                        return lastAdded;
+                    }
+                    else if (!seen.Contains(startState[2]))
+                    {
+                        if (seen.Count() > 0)
+                        {
+                            Debug.WriteLine($"Seen List Last:  {seen.Last()} : Item not in seen: {startState[2]}");
+                        }
+                    }
+                    seen.Add(startState[2]);
+                    lastAdded = startState[2];
+                }
 
                 pointerValue = startState[pointerIndex];
 
                 i = pointerValue;
             }
 
-            return startState[0];
+            return lastAdded;
         }
 
         private int[] UseOpCode(string name, int[] startState, int[] operations)
