@@ -77,6 +77,7 @@
     <Compile Include="Three\DayThree.cs" />
     <Compile Include="Twelve\DayTwelve.cs" />
     <Compile Include="TwentyOne\DayTwentyOne.cs" />
+    <Compile Include="TwentyThree\DayTwentyThree.cs" />
     <Compile Include="Twenty\DayTwenty.cs" />
     <Compile Include="Two\DayTwo.cs" />
   </ItemGroup>
@@ -187,6 +188,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="TwentyOne\DayTwentyOneInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TwentyThree\DayTwentyThreeInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TwentyThree\DayTwentyThreeTestInput.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TwentyThree\DayTwentyThreeTestInputB.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Two\DayTwoInput.txt">
