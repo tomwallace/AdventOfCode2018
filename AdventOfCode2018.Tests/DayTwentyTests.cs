@@ -1,5 +1,4 @@
-﻿using AdventOfCode2018.Six;
-using AdventOfCode2018.Twenty;
+﻿using AdventOfCode2018.Twenty;
 using Xunit;
 
 namespace AdventOfCode2018.Tests
@@ -17,34 +16,22 @@ namespace AdventOfCode2018.Tests
             Assert.Equal(expected, result);
         }
 
-        [Theory]
-        [InlineData("E|NNENN", 2)]
-        [InlineData("E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE))", 2)]
-        [InlineData("E|NNENN|WNSE|", 3)]
-        public void SplitByBottomLevelPipe(string input, int expected)
-        {
-            var sut = new DayTwenty();
-            var result = sut.SplitByBottomLevelPipe(input);
-
-            Assert.Equal(expected, result.Count);
-        }
-
         [Fact]
         public void PartA_Actual()
         {
             var sut = new DayTwenty();
             var result = sut.PartA();
 
-            Assert.Equal("-1", result);
+            Assert.Equal("3672", result);
         }
 
         [Fact]
         public void PartB_Actual()
         {
-            var sut = new DaySix();
+            var sut = new DayTwenty();
             var result = sut.PartB();
 
-            Assert.Equal("42123", result);
+            Assert.Equal("8586", result);
         }
     }
 }

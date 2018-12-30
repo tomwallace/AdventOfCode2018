@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode2018.Twenty
 {
@@ -8,7 +9,7 @@ namespace AdventOfCode2018.Twenty
 
         public string Description()
         {
-            return "A Regular Map";
+            return "A Regular Map (HARD)";
         }
 
         public int SortOrder()
@@ -16,6 +17,7 @@ namespace AdventOfCode2018.Twenty
             return 20;
         }
 
+        // I was completely stuck on this problem and needed some help from Reddit to even get started.
         public string PartA()
         {
             int doors = FindTheMostNumberOfDoors(Input);
@@ -24,80 +26,261 @@ namespace AdventOfCode2018.Twenty
 
         public string PartB()
         {
-            string filePath = @"Four\DayFourInput.txt";
-            //int factor = DetermineMinuteMostAsleepFactor(filePath);
-            return "".ToString();
+            int count = FindPassThrough1000Doors(Input);
+            return count.ToString();
         }
 
         public int FindTheMostNumberOfDoors(string input)
         {
-            string trimExtraCharacters = input.Substring(1, input.Length - 2);
-            return TravelPath(trimExtraCharacters, 0);
+            Dictionary<string, Cell> map = BuildMap(input);
+            Dictionary<string, int> pathes = BuildPathes(map);
+
+            int max = pathes.Max(p => p.Value);
+
+            return max - 1;
         }
 
-        public int TravelPath(string path, int doors)
+        public int FindPassThrough1000Doors(string input)
         {
-            if (!path.Contains("("))
-            {
-                return path.Length + doors;
-            }
+            Dictionary<string, Cell> map = BuildMap(input);
+            Dictionary<string, int> pathes = BuildPathes(map);
 
-            // Split up
-            int firstParenIndex = path.IndexOf("(");
-            int lastParenIndex = path.LastIndexOf(")");
+            int count = pathes.Count(p => p.Value > 1000);
 
-            int before = firstParenIndex;
-            int after = path.Length - (lastParenIndex + 1);
-
-            string middle = path.Substring(before + 1, path.Length - (before + 1 + after + 1));
-            List<string> splitStrings = SplitByBottomLevelPipe(middle);
-
-            int greatest = doors + before + after;
-
-            foreach (var sub in splitStrings)
-            {
-                int subtotal = TravelPath(sub, doors + before + after);
-                if (subtotal > greatest)
-                    greatest = subtotal;
-            }
-
-            return greatest;
+            return count;
         }
 
-        public List<string> SplitByBottomLevelPipe(string input)
+        private Dictionary<string, int> BuildPathes(Dictionary<string, Cell> map)
         {
-            List<int> splitIndexes = new List<int>() {0};
-            int countParen = 0;
-            int index = 0;
+            Dictionary<string, int> pathes = new Dictionary<string, int>();
+            Queue<Point> queue = new Queue<Point>();
+            pathes.Add("0,0", 1);
+            queue.Enqueue(new Point(0, 0));
 
-            foreach (var c in input.ToCharArray())
+            while (queue.Count > 0)
             {
-                if (c == '|' && countParen == 0)
-                    splitIndexes.Add(index);
-
-                if (c == '(')
-                    countParen++;
-
-                if (c == ')')
-                    countParen--;
-
-                index++;
+                Point point = queue.Dequeue();
+                EnqueueIfValid(point.X, point.Y, 0, -1, pathes, map, queue);
+                EnqueueIfValid(point.X, point.Y, 0, +1, pathes, map, queue);
+                EnqueueIfValid(point.X, point.Y, -1, 0, pathes, map, queue);
+                EnqueueIfValid(point.X, point.Y, +1, 0, pathes, map, queue);
             }
-            splitIndexes.Add(input.Length);
+            return pathes;
+        }
 
-            List<string> substrings = new List<string>();
-            for (int i = 0; i < splitIndexes.Count - 1; i++)
+        private void EnqueueIfValid(int x, int y, int xoffset, int yoffset, Dictionary<string, int> pathes, Dictionary<string, Cell> map, Queue<Point> queue)
+        {
+            string doorKey = $"{x + xoffset},{y + yoffset}";
+            string pathKey = $"{x + 2 * xoffset},{y + yoffset * 2}";
+            if (map.ContainsKey(doorKey) && map[doorKey] == Cell.Door && (!pathes.ContainsKey(pathKey) || pathes[pathKey] <= 0))
             {
-                int length = splitIndexes[i + 1] - splitIndexes[i];
-                string sub = input.Substring(splitIndexes[i], length);
-                if (sub[0] == '|')
-                    sub = sub.Substring(1, sub.Length - 1);
+                string key = $"{x + 2 * xoffset},{y + yoffset * 2}";
 
-                if (!string.IsNullOrEmpty(sub))
-                    substrings.Add(sub);
+                if (pathes.ContainsKey(key))
+                    pathes[key] = pathes.ContainsKey($"{x},{y}") ? pathes[$"{x},{y}"] + 1 : 1;
+                else
+                    pathes.Add(key, pathes.ContainsKey($"{x},{y}") ? pathes[$"{x},{y}"] + 1 : 1);
+
+                queue.Enqueue(new Point(x + 2 * xoffset, y + yoffset * 2));
+            }
+        }
+
+        private Dictionary<string, Cell> BuildMap(string input)
+        {
+            Dictionary<string, Cell> map = new Dictionary<string, Cell>();
+            Queue<MapStep> queue = new Queue<MapStep>();
+            queue.Enqueue(new MapStep(input, new Point(0, 0)));
+            map.Add("0,0", Cell.Room);
+
+            while (queue.Count > 0)
+            {
+                MapStep from = queue.Dequeue();
+                bool straight = true;
+                int index = 0;
+                Point position = from.Point;
+
+                while (straight && index < from.InputRemaining.Length)
+                {
+                    switch (from.InputRemaining[index])
+                    {
+                        case '^':
+                            {
+                                // Ignore
+                                index++;
+                                break;
+                            }
+
+                        case '$':
+                            {
+                                // Finished !
+                                straight = false;
+                                break;
+                            }
+
+                        case 'N':
+                            {
+                                position = Move(position, map, 0, -1);
+                                index++;
+                                break;
+                            }
+
+                        case 'W':
+                            {
+                                position = Move(position, map, -1, 0);
+                                index++;
+                                break;
+                            }
+
+                        case 'E':
+                            {
+                                position = Move(position, map, 1, 0);
+                                index++;
+                                break;
+                            }
+
+                        case 'S':
+                            {
+                                position = Move(position, map, 0, 1);
+                                index++;
+                                break;
+                            }
+
+                        case '(':
+                            {
+                                // Start a new fork
+                                StartFork(index, from.InputRemaining, position, queue);
+                                straight = false;
+                                break;
+                            }
+                    }
+                }
             }
 
-            return substrings;
+            return map;
+        }
+
+        private void StartFork(int index, string input, Point from, Queue<MapStep> queue)
+        {
+            // Look for closing parenthesis and group
+            int groupIndex = index + 1;
+            int level = 0;
+            List<string> groups = new List<string>();
+
+            for (int i = index + 1; i < input.Length; ++i)
+            {
+                switch (input[i])
+                {
+                    case ')':
+                        {
+                            if (level == 0)
+                            {
+                                // Matching closing parenthesis
+                                string remaining = input.Substring(i + 1);
+
+                                // Optimisation based on the description of the problem
+                                if (groupIndex == i)
+                                {
+                                    // This is an empty group
+                                    // We assume that ALL pathes from the groups are loop, as suggested by the description
+                                    // So instead of forking the regex for each group, we play each group individually,
+                                    // then resume as if all the groups were not there
+                                    foreach (string group in groups)
+                                    {
+                                        queue.Enqueue(new MapStep(group, from));
+                                    }
+                                    queue.Enqueue(new MapStep(remaining, from));
+                                }
+                                else
+                                {
+                                    // Create the last group
+                                    groups.Add(input.Substring(groupIndex, i - groupIndex));
+
+                                    // Enqueue all next tasks
+                                    foreach (string group in groups)
+                                    {
+                                        queue.Enqueue(new MapStep(group + remaining, from));
+                                    }
+                                }
+
+                                return;
+                            }
+                            else
+                            {
+                                level--;
+                            }
+                            break;
+                        }
+
+                    case '(':
+                        {
+                            level++;
+                            break;
+                        }
+
+                    case '|':
+                        {
+                            if (level == 0)
+                            {
+                                // Add this group
+                                groups.Add(input.Substring(groupIndex, i - groupIndex));
+
+                                // Move to the next one
+                                groupIndex = i + 1;
+                            }
+                            break;
+                        }
+                }
+            }
+        }
+
+        private Point Move(Point from, Dictionary<string, Cell> map, int xoffset, int yoffset)
+        {
+            string doorKey = $"{from.X + xoffset},{from.Y + yoffset}";
+            if (map.ContainsKey(doorKey))
+                map[doorKey] = Cell.Door;
+            else
+                map.Add(doorKey, Cell.Door);
+
+            string roomKey = $"{from.X + 2 * xoffset},{from.Y + 2 * yoffset}";
+            if (map.ContainsKey(roomKey))
+                map[roomKey] = Cell.Room;
+            else
+                map.Add(roomKey, Cell.Room);
+
+            return new Point(from.X + 2 * xoffset, from.Y + 2 * yoffset);
         }
     }
+
+    public class Point
+    {
+        public int X { get; set; }
+
+        public int Y { get; set; }
+
+        public Point(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+    }
+
+    public class MapStep
+    {
+        public Point Point { get; set; }
+
+        public string InputRemaining { get; set; }
+
+        public MapStep(string inputRemaining, Point point)
+        {
+            InputRemaining = inputRemaining;
+            Point = point;
+        }
+    }
+
+    public enum Cell
+    {
+        Wall = 0,
+        Door = 1,
+        Room = 2
+    };
 }
