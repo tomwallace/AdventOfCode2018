@@ -48,6 +48,9 @@ namespace AdventOfCode2018.TwentyTwo
         public int FindBestTimeThroughCave(int caveDepth, int targetX, int targetY)
         {
             int bestTime = int.MaxValue;
+            // I struggled with this one because I wanted to use constructed strings instead of custom classes for the Hashset
+            // but then I did not separate the values in the strings with commas, so it was mismatching the values that overlapped
+            // This made me lose hours of work.
             HashSet<string> stepsCovered = new HashSet<string>();
 
             Queue<JourneyStep> queue = new Queue<JourneyStep>();
