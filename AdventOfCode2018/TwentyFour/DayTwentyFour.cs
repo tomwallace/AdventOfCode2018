@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using AdventOfCode2018.TwentyThree;
 
 namespace AdventOfCode2018.TwentyFour
 {
@@ -11,7 +9,7 @@ namespace AdventOfCode2018.TwentyFour
     {
         public string Description()
         {
-            return "Immune System Simulator 20XX";
+            return "Immune System Simulator 20XX (HARD)";
         }
 
         public int SortOrder()
@@ -22,7 +20,7 @@ namespace AdventOfCode2018.TwentyFour
         public string PartA()
         {
             string filePath = @"TwentyFour\DayTwentyFourInput.txt";
-            int units = DetermineHowManyUnitsLeft(filePath, 0, false);
+            int units = DetermineHowManyUnitsLeft(filePath, 0, false).UnitsLeft;
             return units.ToString();
         }
 
@@ -36,27 +34,48 @@ namespace AdventOfCode2018.TwentyFour
         public int DetermineMinImmuneSystemUnits(string filePath)
         {
             int boost = 0;
-            int remainingUnits = -1;
+            BattleResult result = new BattleResult();
 
             do
             {
                 boost++;
-                remainingUnits = DetermineHowManyUnitsLeft(filePath, boost, true);
-            } while (remainingUnits < 0);
+                result = DetermineHowManyUnitsLeft(filePath, boost, true);
+            } while (!result.ImmuneSystemWon);
 
-            return remainingUnits;
+            return result.UnitsLeft;
         }
 
-        public int DetermineHowManyUnitsLeft(string filePath, int boost, bool checkCureOnly)
+        // TODO: Remove the bool if not needed
+        public BattleResult DetermineHowManyUnitsLeft(string filePath, int boost, bool checkCureOnly)
         {
             List<Group> armies = ParseArmies(filePath, boost);
 
-            do
+            bool attackCompleted = true;
+            while (attackCompleted)
             {
-                SelectTargets(armies);
+                attackCompleted = false;
+
+                Dictionary<Group, Group> targets = SelectTargets(armies);
 
                 // Do Damage
-                bool noDamageDone = true;
+                foreach (Group group in armies.OrderByDescending(a => a.Initiative))
+                {
+                    // Exclude any groups without units
+                    if (group.Units > 0 && targets[group] != null)
+                    {
+                        Group target = targets[group];
+                        int damage = target.CalculateDamageDone(group.AttackType, group.EffectivePower);
+                        if (damage > 0 && target.Units > 0)
+                        {
+                            int origUnits = target.Units;
+                            target.ReceiveDamage(damage);
+                            if (target.Units < origUnits)
+                                attackCompleted = true;
+                        }
+                    }
+                }
+
+                /*
                 armies = armies.OrderByDescending(a => a.Initiative).ToList();
                 for (int i = 0; i < armies.Count; i++)
                 {
@@ -87,29 +106,53 @@ namespace AdventOfCode2018.TwentyFour
                     Debug.WriteLine($"Boost: {boost} = stalemate");
                     return -1;
                 }
-                    
 
                 // Reset all group targets
+                armies = armies.Where(a => a.Units > 0).ToList();
+                /*
                 foreach (Group group in armies)
                 {
                     group.Target = null;
                 }
+                */
 
-            } while (armies.Count(a => a.IsInfection) > 0 && armies.Count(a => !a.IsInfection) > 0);
+                armies = armies.Where(a => a.Units > 0).Select(a => a).ToList();
+            }// while (armies.Count(a => a.IsInfection) > 0 && armies.Count(a => !a.IsInfection) > 0);
 
+            /*
             int immuneSystemUnits = armies.Count(a => !a.IsInfection);
             if (checkCureOnly && immuneSystemUnits == 0)
             {
                 Debug.WriteLine($"Boost: {boost} not enough.  All Immune died.");
                 return -1;
             }
-                
 
             return armies.Sum(a => a.Units);
+            */
+            return new BattleResult()
+            {
+                ImmuneSystemWon = armies.All(a => !a.IsInfection),
+                UnitsLeft = armies.Sum(a => a.Units)
+            };
         }
 
-        private List<Group> SelectTargets(List<Group> armies)
+        private Dictionary<Group, Group> SelectTargets(List<Group> armies)
         {
+            HashSet<Group> remainingTargets = new HashSet<Group>(armies);
+            Dictionary<Group, Group> targets = new Dictionary<Group, Group>();
+            /*
+            foreach (Group g in armies.OrderByDescending(a => a.EffectivePower).ThenByDescending(a => a.Initiative).ToList())
+            {
+                int maxDamage = remainingTargets.Where(t => t.IsInfection != g.IsInfection).Select(t => t.CalculateDamageDone(g.AttackType, g.EffectivePower)).Max();
+                List<Group> possibleTargets = remainingTargets.Where(t => t.IsInfection != g.IsInfection).Where(t => t.CalculateDamageDone(g.AttackType, g.EffectivePower) == maxDamage).ToList();
+                List<Group> sortedPossibleTargets = possibleTargets.OrderByDescending(t => t.EffectivePower).ThenByDescending(t => t.Initiative).ToList();
+                targets[g] = sortedPossibleTargets.First();
+                remainingTargets.Remove(targets[g]);
+            }
+
+            return targets;
+            */
+
             armies = armies.OrderByDescending(a => a.EffectivePower).ThenByDescending(a => a.Initiative).ToList();
             List<Group> alreadySelected = new List<Group>();
             foreach (Group group in armies)
@@ -122,10 +165,11 @@ namespace AdventOfCode2018.TwentyFour
                         .ThenByDescending(a => a.Initiative)
                         .FirstOrDefault();
 
-                group.Target = target;
+                //group.Target = target;
+                targets.Add(group, target);
                 alreadySelected.Add(target);
             }
-            return armies;
+            return targets;
         }
 
         private List<Group> ParseArmies(string filePath, int boost)
@@ -225,7 +269,7 @@ namespace AdventOfCode2018.TwentyFour
 
         public int Initiative { get; set; }
 
-        public int EffectivePower => Units*AttackDamage;
+        public int EffectivePower => Units * AttackDamage;
 
         public Group Target { get; set; }
 
@@ -242,13 +286,20 @@ namespace AdventOfCode2018.TwentyFour
 
         public void ReceiveDamage(int damage)
         {
-            int lostUnits = (int)Math.Truncate((double)damage/HitPoints);
-            Units -= lostUnits;
+            var lostUnits = damage / HitPoints;
+            Units = Math.Max(0, Units - lostUnits);
         }
 
         public override string ToString()
         {
             return $"{IsInfection}|{Units}";
         }
+    }
+
+    public class BattleResult
+    {
+        public bool ImmuneSystemWon { get; set; }
+
+        public int UnitsLeft { get; set; }
     }
 }
