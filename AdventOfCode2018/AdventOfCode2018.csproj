@@ -66,6 +66,7 @@
     <Compile Include="Nineteen\DayNineteen.cs" />
     <Compile Include="Nine\DayNine.cs" />
     <Compile Include="One\DayOne.cs" />
+    <Compile Include="One\DayOneErin.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Seventeen\DaySeventeen.cs" />
